@@ -2,32 +2,34 @@ import random
 import urllib.request
 import re
 
-def fill_unwatched(numeps):
+def fill_unwatched(numeps, newep):
     eplist = [0, 13, 22, 22, 19, 19, 22]
-    f = open("unwatched_episodes.txt", "w")
+    f = open("unwatched_episodes.txt", "r+")
+    d = f.readlines()
+    f.seek(0) # go back to top
+
+    for line in d:
+        if line.strip("\n") != newep:
+            f.write(line)
+
+    f.truncate()
 
     g = open("watched_episodes.txt")
-    watched = g.read().split("\n")
+    watched = g.readlines()
 
-    for season in range(1, len(eplist)):
-        for epnum in range(1, eplist[season]+1):
-            epname = str(season) + "." + str(epnum)
-            if epname not in watched:
-                f.write(epname + "\n")
+    # for season in range(1, len(eplist)):
+    #     for epnum in range(1, eplist[season]+1):
+    #         epname = str(season) + "." + str(epnum)
+    #         if epname not in watched:
+    #             f.write(epname + "\n")
 
-    f.close()
-    f = open("unwatched_episodes.txt")
 
-    w = f.read()
 
-    wlen = len(w.split("\n"))
-    ulen = len(watched)
-
-    if wlen + ulen - 2 < numeps:
+    if len(d) - 1 + len(watched) < numeps:
         print("ERROR! MISSING EPISODE!")
-        print(wlen)
-        print(ulen)
-        print(numeps - wlen - ulen, "missing episodes")
+        print(len(d) - 1)
+        print(len(watched))
+        print(numeps - len(d) + 1 - len(watched), "missing episodes")
 
     g.close()
     f.close()
@@ -76,38 +78,36 @@ if __name__ == "__main__":
 
     f = open("unwatched_episodes.txt")
     unwatched = f.read()
+    f.close()
     unwatched = unwatched.split("\n")
 
     num = random.randint(0, len(unwatched)-1)
     episode = unwatched[num]
 
-    episode = episode.split(".")
+    seasep = episode.split(".")
 
 
-    g = open("watched_episodes.txt", "a")
+    g = open("watched_episodes.txt", "r+")
+    watched = g.readlines()
     g.write(unwatched[num] + "\n")
     g.close()
 
-    g = open("watched_episodes.txt")
-    watched = g.read()
-    watched = watched.split("\n")
 
+    lastfive = watched[-5:]
 
-    lastfive = watched[-7:-2]
-
-    print("Watch Season", episode[0], "episode", episode[1], end = "\n")
+    print("Watch Season", seasep[0], "episode", seasep[1], end = "\n")
     print()
-    epinfo(episode[0], episode[1])
+    epinfo(seasep[0], seasep[1])
     print()
 
     print("Enjoy! Here are the last five episodes of Riverdale you watched:")
     print("=====")
-    for episode in reversed(lastfive):
-        print(episode)
+    for ep in reversed(lastfive):
+        print(ep.strip("\n"))
     print("=====")
 
 
-    fill_unwatched(numeps)
+    fill_unwatched(numeps, episode)
 
 
     
