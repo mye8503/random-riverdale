@@ -1,9 +1,9 @@
 import random
 import urllib.request
 import re
+import sys
 
-def fill_unwatched(numeps, newep):
-    eplist = [0, 13, 22, 22, 19, 19, 22]
+def update_unwatched(numeps, newep):
     f = open("unwatched_episodes.txt", "r+")
     d = f.readlines()
     f.seek(0) # go back to top
@@ -16,13 +16,6 @@ def fill_unwatched(numeps, newep):
 
     g = open("watched_episodes.txt")
     watched = g.readlines()
-
-    # for season in range(1, len(eplist)):
-    #     for epnum in range(1, eplist[season]+1):
-    #         epname = str(season) + "." + str(epnum)
-    #         if epname not in watched:
-    #             f.write(epname + "\n")
-
 
 
     if len(d) - 1 + len(watched) < numeps:
@@ -70,10 +63,8 @@ def epinfo(season, episode):
     print()
     print(desc)
 
-    
 
-
-if __name__ == "__main__":
+def run_normal():
     numeps = 117
 
     f = open("unwatched_episodes.txt")
@@ -92,8 +83,10 @@ if __name__ == "__main__":
     g.write(unwatched[num] + "\n")
     g.close()
 
-
-    lastfive = watched[-5:]
+    if len(watched) >= 5:
+        lastfive = watched[-5:]
+    else:
+        lastfive = watched
 
     print("Watch Season", seasep[0], "episode", seasep[1], end = "\n")
     print()
@@ -101,13 +94,44 @@ if __name__ == "__main__":
     print()
 
     print("Enjoy! Here are the last five episodes of Riverdale you watched:")
-    print("=====")
+    print("\n=====")
     for ep in reversed(lastfive):
         print(ep.strip("\n"))
     print("=====")
 
 
-    fill_unwatched(numeps, episode)
+    update_unwatched(numeps, episode)
+
+
+def reset():
+    f = open("watched_episodes.txt", "w")
+    f.close()
+
+    f = open("unwatched_episodes.txt", "w")
+
+    eplist = [0, 13, 22, 22, 19, 19, 22]
+
+    for season in range(1, len(eplist)):
+        for epnum in range(1, eplist[season]+1):
+            epname = str(season) + "." + str(epnum)
+            f.write(epname + "\n")
+    
+
+
+if __name__ == "__main__":
+    print()
+    
+    if len(sys.argv) == 1:
+        run_normal()
+
+    else:
+        if sys.argv[1].lower() == "reset":
+            reset()
+
+
+
+
+    
 
 
     
